@@ -19,8 +19,8 @@ class InstructorController extends Controller
     }
     public function showAll()
     {
-        $instructor = Instructor::select('*')->get();
-        return $instructor;
+        $data = Instructor::select('*')->paginate(10);
+        return $data;
     }
 
     public function create(Request $request)
@@ -53,8 +53,8 @@ class InstructorController extends Controller
         $inscourse=Course::where("instructor_id","=","$id")->where("semester_id",'=',"$id")->get();
         if($inscourse==null){
         Instructor::destroy($id);}
-        else return response(409,"لا يمكن حذف تدريسي لديه مواد حالية");
-        return response('تم حذف التدريسي بنجاح', 200);
+        else return response(409);
+        return response(200);
     }
 }
 

@@ -23,8 +23,8 @@ class StudentController extends Controller
         $this->middleware('auth:sanctum')
             ->only(['destroy', 'create', 'update']);
     }
-    public function showAll(){
-        $students = Student::select('*')->where('isGrad','=',false)->get();
+    public function showAll($level){
+        $students = Student::select('*')->where("year","=",$level)->where('isGrad','=',false)->paginate(10);
         return $students;
     }
     public function getCurAvg(Request $request){
@@ -77,7 +77,7 @@ class StudentController extends Controller
        foreach ($deg as $d ) {
             Degree::destroy($deg);
        }
-        return response('تم حذف الطالب بنجاح', 200);
+        return response(200);
     }
 
     public function remove($id)
@@ -86,7 +86,7 @@ class StudentController extends Controller
      $student =Student::where('id','=',"$id")->first();
      $student->isEnded = true; 
      $student->save();
-        return response('تم حذف الطالب بنجاح', 200);
+        return response(200);
     }
 
 public function update(Request $request){
@@ -115,13 +115,13 @@ public function attendency(Request $request){
     $course = Course::select('*')->where('name_en','=',"$request->name_en")->first();
     $student = Student::select('*')->where('id','=',"$request->student_id")->first();
     if($course==null){
-        return response("لا يوجد كورس بهذا الاسم, الرجاء التأكد",410);
+        return response(410);
     }
     if($student->level != $course->level){
-        return response('لا يمكنك اضافة كورس من مرحلة دراسية مختلفة', 409);
+        return response(409);
     }
     if($student->year == $course->year){
-        return response('الطالب ينتمي الى هذا الكورس مسبقاً', 411);
+        return response(411);
     }
     $carry =Carry::where("course_id","=","$course->id")->where("student_id","=","$student->id")->first();
     if($carry==null){
@@ -130,8 +130,8 @@ public function attendency(Request $request){
             'student_id'=>$student->id,
             'attend_carry'=>'attend'
         ]);
-        return response('done',200);
-    } else  return response('الطالب ينتمي الى هذا الكورس مسبقاً', 411);
+        return response(200);
+    } else  return response(411);
 
 }
 

@@ -23,16 +23,11 @@ class CourseController extends Controller
     {
         $semester = Semester::where('isEnded', '=', false)->first();
         $id = $semester->id;
-        $courses = Course::with('instructor')->with('studentsCarry')->select('*')->where('semester_id', "=", $id)->get();
-        $newList = [];
-        foreach ($courses as $course) {
-            $students = Student::select('*')->where('level', '=', $course->level)
-                ->where('year', '=', $course->year)->where('isEnded',"=",false)
-                ->get();
-            $course['students'] = $students;
-            array_push($newList, $course);
-        }
-        return $newList;
+        $coursesQuery = Course::select('*')->where('semester_id', "=", $id);
+        $courses = $coursesQuery->paginate(10);
+
+      
+        return $courses;
     }
     public function showAll(Request $request)
     {
