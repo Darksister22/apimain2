@@ -23,9 +23,13 @@ class StudentController extends Controller
         $this->middleware('auth:sanctum')
             ->only(['destroy', 'create', 'update']);
     }
-    public function showAll($level){
-        $students = Student::select('*')->where("year","=",$level)->where('isGrad','=',false)->paginate(10);
-        return $students;
+    public function showAll(Request $request,$level){
+        $query = Student::select('*')->where("year","=",$level)->where('isGrad','=',false); 
+        if ($request->has('search')) {
+            $query->where('name_ar', 'like', '%' . $request->input('search') . '%');
+        }
+        $data = $query->paginate(10);
+        return $data;
     }
     public function getCurAvg(Request $request){
         $id = $request->id; 

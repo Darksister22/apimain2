@@ -19,15 +19,16 @@ class CourseController extends Controller
         $this->middleware('auth:sanctum')
             ->only(['destroy', 'create', 'update']);
     }
-    public function showCurrent()
+    public function showCurrent(Request $request)
     {
         $semester = Semester::where('isEnded', '=', false)->first();
         $id = $semester->id;
-        $coursesQuery = Course::select('*')->where('semester_id', "=", $id);
-        $courses = $coursesQuery->paginate(10);
-
-      
-        return $courses;
+        $query = Course::select('*')->where('semester_id', "=", $id);
+        if ($request->has('search')) {
+            $query->where('name_en', 'like', '%' . $request->input('search') . '%');
+        }
+        $data = $query->paginate(10);
+        return $data;
     }
     public function showAll(Request $request)
     {

@@ -20,9 +20,17 @@ class UserController extends Controller
         $this->middleware('auth:sanctum')
             ->only(['destroy', 'create', 'update']);
     }
-    public function get(){
-        $users = User::select('*')->get();
-        return $users;
+    public function get(Request $request)
+    {
+        $query = User::select('*');
+        if ($request->has('search')) {
+            $query->where('name', '=', '%' . $request->input('search') . '%');
+        }
+        $data = $query->paginate(10);
+        return $data;
+
+    }
+    
     }
     public function login(Request $request)
     {

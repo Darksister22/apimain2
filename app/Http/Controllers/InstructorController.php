@@ -17,11 +17,16 @@ class InstructorController extends Controller
         $this->middleware('auth:sanctum')
             ->only(['destroy', 'create', 'update']);
     }
-    public function showAll()
+    public function showAll(Request $request)
     {
-        $data = Instructor::select('*')->paginate(10);
+        $query = Instructor::select('*');
+        if ($request->has('search')) {
+            $query->where('name_ar', '=', '%' . $request->input('search') . '%');
+        }
+        $data = $query->paginate(10);
         return $data;
     }
+    
 
     public function create(Request $request)
     {
